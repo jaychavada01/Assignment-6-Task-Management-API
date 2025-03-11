@@ -33,7 +33,6 @@ This **Task Management API** is a backend service built using **Node.js, Express
 - **Backend:** Node.js, Express.js
 - **Database:** PostgreSQL with Sequelize ORM
 - **Authentication:** JWT (JSON Web Tokens)
-- **Storage:** AWS S3 (for file storage)
 <!-- - **Notifications:** Firebase Cloud Messaging (FCM) -->
 
 ## 📂 Project Structure
