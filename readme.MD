@@ -11,6 +11,7 @@ This **Task Management API** is a backend service built using **Node.js, Express
 - User Registration & Login
 - Password Reset & Change Password
 - JWT-based Authentication
+- Token Blacklisting for Security
 
 ### **Task Management**
 
@@ -24,16 +25,16 @@ This **Task Management API** is a backend service built using **Node.js, Express
 - **Filter tasks** by status, category, or priority
 - **Sort tasks** by due date, priority, or creation date
 
-<!-- ### **Due Date & Alerts**
+### **Due Date & Alerts**
 - Set due dates for tasks
-- Receive overdue task notifications -->
+- Receive overdue task notifications via Firebase Cloud Messaging (FCM)
 
 ## 🛠️ Tech Stack
 
 - **Backend:** Node.js, Express.js
 - **Database:** PostgreSQL with Sequelize ORM
 - **Authentication:** JWT (JSON Web Tokens)
-<!-- - **Notifications:** Firebase Cloud Messaging (FCM) -->
+- **Notifications:** Firebase Cloud Messaging (FCM)
 
 ## 📂 Project Structure
 
@@ -42,7 +43,9 @@ Assignment 6/
 ├─ api/
 │  ├─ config/
 │  │  ├─ constant.js          # Stores status codes & constants
-│  │  └─ database.js          # Database connection setup
+│  │  ├─ database.js          # Database connection setup
+│  │  ├─ firebase.js          # Firebase configuration
+│  │  └─ serviceAccountKey.json # Firebase service account
 │  ├─ controllers/
 │  │  ├─ taskController.js    # Task CRUD operations
 │  │  └─ userController.js    # User authentication & profile
@@ -55,11 +58,12 @@ Assignment 6/
 │  │  ├─ taskRoute.js         # Task API routes
 │  │  └─ userRoute.js         # User authentication routes
 │  ├─ utils/
-│  │  └─ mailer.js            # Email handling utility
+│  │  ├─ mailer.js            # Email handling utility
+│  │  ├─ sendDueNotification.js # FCM notification handler
 │  ├─ .env                    # Environment variables
 │  ├─ app.js                  # Main application entry point
 │  ├─ package-lock.json
-│  └─ package.json
+│  ├─ package.json
 ├─ .gitignore                 # Ignore files for Git
 └─ readme.md                  # Project Documentation
 ```
@@ -69,8 +73,8 @@ Assignment 6/
 ### 1️⃣ **Clone the Repository**
 
 ```sh
-git clone https://github.com/your-repo/task-management-api.git
-cd task-management-api
+git clone https://github.com/jaychavada01/Assignment-6-Task-Management-API.git
+cd api
 ```
 
 ### 2️⃣ **Install Dependencies**
@@ -87,7 +91,7 @@ Create a `.env` file in the root directory and add the following:
 PORT=3000
 JWT_SECRET=your_jwt_secret
 
-#DB CREDENTIALS
+# DB CREDENTIALS
 DB_NAME=your_db_name
 DB_USER=your_user
 DB_PASSWORD=your_pass
@@ -137,3 +141,4 @@ The API will be running at `http://localhost:3000`
 - **JWT-based authentication** for secure API access
 - **Token blacklisting** for enhanced security
 - **Password hashing** with bcrypt
+- **Firebase push notifications** for task reminders
