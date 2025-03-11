@@ -1,5 +1,7 @@
 const { STATUS_CODES } = require("../config/constant");
 const Task = require("../models/task");
+const User = require("../models/user");
+const { sendDueDateNotification } = require("../utills/sendDueNotification");
 
 exports.createTask = async (req, res) => {
   try {
@@ -28,6 +30,12 @@ exports.createTask = async (req, res) => {
       category,
       userId,
     });
+
+    // Fetch user's device token
+    const user = await User.findByPk(userId);
+    if (user && user.fcmtoken) {
+      await sendDueDateNotification(user.fcmtoken, title, dueDate);
+    }
 
     return res
       .status(STATUS_CODES.CREATED)
@@ -127,7 +135,9 @@ exports.updateTask = async (req, res) => {
       .status(STATUS_CODES.SUCCESS)
       .json({ success: true, message: "Task updated successfully", task });
   } catch (error) {
-    res.status(STATUS_CODES.SERVER_ERROR).json({ message: "Error updating task!" });
+    res
+      .status(STATUS_CODES.SERVER_ERROR)
+      .json({ message: "Error updating task!" });
   }
 };
 

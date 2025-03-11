@@ -40,6 +40,10 @@ const User = sequelize.define(
       allowNull: true,
       defaultValue: [],
     },
+    fcmToken: {
+      type: DataTypes.STRING,
+      allowNull: true, // Store
+    },
   },
   {
     timestamps: true,
