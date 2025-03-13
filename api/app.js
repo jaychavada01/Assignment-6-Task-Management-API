@@ -1,4 +1,5 @@
 require("dotenv").config({ path: `${process.cwd()}/api/.env` });
+require("./config/cron");
 
 const express = require("express");
 const { sequelize } = require("./config/database");
@@ -18,9 +19,7 @@ app.use("/api/task", taskRoute);
 
 //? Handle invalid routes
 app.use("*", (req, res) => {
-  res
-    .status(STATUS_CODES.BAD_REQUEST)
-    .json({ message: "Invalid Route!" });
+  res.status(STATUS_CODES.BAD_REQUEST).json({ message: "Invalid Route!" });
 });
 
 // ? sync sequelize and start server

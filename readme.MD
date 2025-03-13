@@ -1,6 +1,6 @@
 # Task Management API
 
-## 📌 Project Overview
+## 📉 Project Overview
 
 This **Task Management API** is a backend service built using **Node.js, Express, and Sequelize** for managing user tasks. It provides features such as user authentication, task CRUD operations, filtering, sorting, and notifications for due dates.
 
@@ -53,13 +53,14 @@ Assignment 6/
 │  │  └─ auth.js              # Authentication middleware
 │  ├─ models/
 │  │  ├─ task.js              # Task model definition
-│  │  └─ user.js              # User model definition
+│  │  ├─ user.js              # User model definition
+│  │  ├─ comment.js           # Comment model definition
 │  ├─ routes/
 │  │  ├─ taskRoute.js         # Task API routes
-│  │  └─ userRoute.js         # User authentication routes
+│  │  ├─ userRoute.js         # User authentication routes
 │  ├─ utils/
 │  │  ├─ mailer.js            # Email handling utility
-│  │  ├─ sendDueNotification.js # FCM notification handler
+│  │  ├─ notification.js      # FCM notification handler
 │  ├─ .env                    # Environment variables
 │  ├─ app.js                  # Main application entry point
 │  ├─ package-lock.json
@@ -70,20 +71,20 @@ Assignment 6/
 
 ## ⚡ Installation & Setup
 
-### 1️⃣ **Clone the Repository**
+### 1⃣ **Clone the Repository**
 
 ```sh
 git clone https://github.com/jaychavada01/Assignment-6-Task-Management-API.git
 cd api
 ```
 
-### 2️⃣ **Install Dependencies**
+### 2⃣ **Install Dependencies**
 
 ```sh
 npm install
 ```
 
-### 3️⃣ **Set Up Environment Variables**
+### 3⃣ **Set Up Environment Variables**
 
 Create a `.env` file in the root directory and add the following:
 
@@ -105,7 +106,7 @@ MAILTRAP_USER=your_mailtrap_username
 MAILTRAP_PASS=your_mailtrap_password
 ```
 
-### 4️⃣ **Start the Server**
+### 4⃣ **Start the Server**
 
 ```sh
 npm run server
@@ -136,9 +137,17 @@ The API will be running at `http://localhost:3000`
 | PUT    | `/api/tasks/:id`    | Update task details     |
 | DELETE | `/api/tasks/:id`    | Delete a task           |
 
+### **Comments on Tasks**
+
+| Method | Endpoint                  | Description                          |
+| ------ | ------------------------- | ------------------------------------ |
+| POST   | `/api/task/comment/:taskId`   | Add a comment to a task             |
+| GET    | `/api/task/comments/:taskId`   | Get comments sorted by created date |
+
 ## 🛡️ Security Measures
 
 - **JWT-based authentication** for secure API access
 - **Token blacklisting** for enhanced security
 - **Password hashing** with bcrypt
 - **Firebase push notifications** for task reminders
+

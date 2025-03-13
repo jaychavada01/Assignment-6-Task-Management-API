@@ -14,19 +14,7 @@ exports.authenticate = async (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      if (error.name === "TokenExpiredError") {
-        return res.status(STATUS_CODES.UNAUTHORIZED).json({
-          message: "Token has expired! Please login again.",
-        });
-      }
-      return res
-        .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Invalid Token!" });
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // ? Finding the user
     const user = await User.findOne({ where: { id: decoded.id } });

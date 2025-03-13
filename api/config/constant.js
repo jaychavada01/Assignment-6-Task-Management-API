@@ -10,6 +10,7 @@ module.exports = {
     CONFLICT: 409,
     SERVER_ERROR: 500,
   },
+
   //? Validation Rules
   VALIDATION_RULES: {
     SIGNUP: {
@@ -34,6 +35,24 @@ module.exports = {
       token: "required|string",
       newPassword:
         "required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/",
+    },
+
+    //? Task Validation Rules
+    CREATE_TASK: {
+      title: "required|string|min:3|max:100",
+      description: "string|max:500",
+      dueDate: "required|date",
+      priority: "required|string|in:High,Medium,Low",
+      category: "required|string|in:Work,Personal",
+    },
+
+    UPDATE_TASK: {
+      title: "string|min:3|max:100",
+      description: "string|max:500",
+      dueDate: "date",
+      priority: "string|in:High,Medium,Low",
+      status: "string|in:todo,inprocess,inreview,testing,Completed",
+      category: "string|in:Work,Personal",
     },
   },
 };

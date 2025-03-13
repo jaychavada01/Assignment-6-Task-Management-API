@@ -46,10 +46,10 @@ exports.signupUser = async (req, res, next) => {
     const token = await generateToken(newUser);
 
     const htmlContent = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-    <h2 style="color: #333;">Hey...</h2>
-    <p>Hello <strong>${newUser.fullName}</strong>, Welcome to Task Management Tool</p>
-    <p>We received details of you. we are welcoming you to onboard!</p>
-  </div>`;
+                <h2 style="color: #333;">Hey...</h2>
+                <p>Hello <strong>${newUser.fullName}</strong>, Welcome to Task Management Tool</p>
+                <p>We received details of you. we are welcoming you to onboard!</p>
+    </div>`;
 
     // Send reset email with token
     await sendEmail(email, "Welcomt to Our platform!", htmlContent);
@@ -111,6 +111,7 @@ exports.logoutUser = async (req, res) => {
     // ? Add token to blacklist array
     user.blacklistedTokens = [...(user.blacklistedTokens || []), token];
     user.accessToken = null; // ? Clear active token
+    user.fcmToken = null; // ? Clear fcm tokens
     await user.save();
 
     res.status(STATUS_CODES.SUCCESS).json({ message: "Logout Successful!" });
@@ -218,8 +219,9 @@ exports.changePassword = async (req, res) => {
       return;
 
     const { oldPassword, newPassword } = req.body;
-    const user = res.user;
+    const userId = req.user.id; // Extracted from authenticated token
 
+    const user = await User.findByPk(userId)
     if (!user) {
       return res
         .status(STATUS_CODES.NOT_FOUND)

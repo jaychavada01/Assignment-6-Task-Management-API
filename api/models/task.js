@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const {sequelize} = require("../config/database");
+const { sequelize } = require("../config/database");
 const User = require("./user");
 
 const Task = sequelize.define("Task", {
@@ -26,13 +26,17 @@ const Task = sequelize.define("Task", {
     defaultValue: "Medium",
   },
   status: {
-    type: DataTypes.ENUM("pending", "completed"),
-    allowNull: false,
-    defaultValue: "pending",
+    type: DataTypes.ENUM("todo", "inprocess", "inreview", "testing", "Completed"),
+    allowNull: true,
+    defaultValue: "todo",
   },
   category: {
     type: DataTypes.ENUM("Work", "Personal"),
     allowNull: false,
+  },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   userId: {
     type: DataTypes.UUID,
@@ -43,9 +47,22 @@ const Task = sequelize.define("Task", {
     },
     onDelete: "CASCADE",
   },
+  parentTaskId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: "Tasks",
+      key: "id",
+    },
+    onDelete: "CASCADE",
+  },
 });
 
+// Define relationships
 User.hasMany(Task, { foreignKey: "userId", onDelete: "CASCADE" });
 Task.belongsTo(User, { foreignKey: "userId" });
+
+Task.hasMany(Task, { as: "subtasks", foreignKey: "parentTaskId", onDelete: "CASCADE" });
+Task.belongsTo(Task, { as: "parentTask", foreignKey: "parentTaskId" });
 
 module.exports = Task;
