@@ -16,7 +16,10 @@
     "incorrect_old_password": "Old password is incorrect!",
     "same_old_password": "Entered old password, Use different!",
     "password_changed": "Password Changed Successfully!",
-    "unauth_user_not": "Unauthorized User not found!"
+    "unauth_user_not": "Unauthorized User not found!",
+    "delete_success": "User deleted successfully!",
+    "update_success": "User updated successfully",
+    "same_data": "Nothing changed!"
   },
   "task": {
     "no_parent": "Parent task not found or not assigned to user.",
@@ -31,9 +34,12 @@
     "task_updated": "Task updated successfully",
     "invalid_status": "Invalid status value!",
     "already_deleted": "Task is already deleted",
-    "deleted": "Task deleted successfully"
+    "deleted": "Task deleted successfully",
+    "task_assign": "Task assigned successfully",
+    "task_reassign": "Task re-assigned successfully",
+    "no_changes" : "No changes were made"
   },
-  "comment":{
+  "comment": {
     "added": "Comment added successfully",
     "all_comments": "Comments retrieved successfully"
   },

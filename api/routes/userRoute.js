@@ -6,6 +6,8 @@ const {
   forgotPassword,
   resetPassword,
   changePassword,
+  deleteUser,
+  updateUser,
 } = require("../controllers/userController");
 const { authenticate } = require("../middleware/auth");
 
@@ -86,11 +88,15 @@ const router = express.Router();
  *       required:
  *         - oldPassword
  *         - newPassword
+ *      DeleteUser:
+ *        type: object
+ *        properties:
+ *
  */
 
 /**
  * @swagger
- * /api/user/signup:
+ * /user/signup:
  *   post:
  *     summary: Register a new user
  *     tags: [Authentication]
@@ -110,7 +116,7 @@ router.post("/signup", signupUser);
 
 /**
  * @swagger
- * /api/user/login:
+ * /user/login:
  *   post:
  *     summary: Log in a user
  *     tags: [Authentication]
@@ -130,7 +136,7 @@ router.post("/login", loginUser);
 
 /**
  * @swagger
- * /api/user/logout:
+ * /user/logout:
  *   post:
  *     summary: Log out the user
  *     tags: [Authentication]
@@ -146,7 +152,7 @@ router.post("/logout", authenticate, logoutUser);
 
 /**
  * @swagger
- * /api/user/forgot-password:
+ * /user/forgot-password:
  *   post:
  *     summary: Request a password reset
  *     tags: [Authentication]
@@ -173,7 +179,7 @@ router.post("/forgot-password", forgotPassword);
 
 /**
  * @swagger
- * /api/user/reset-password:
+ * /user/reset-password:
  *   post:
  *     summary: Reset password using token
  *     tags: [Authentication]
@@ -193,7 +199,7 @@ router.post("/reset-password", resetPassword);
 
 /**
  * @swagger
- * /api/user/change-password:
+ * /user/change-password:
  *   post:
  *     summary: Change user password
  *     tags: [Authentication]
@@ -212,5 +218,61 @@ router.post("/reset-password", resetPassword);
  *         description: Unauthorized or incorrect old password
  */
 router.post("/change-password", authenticate, changePassword);
+
+/**
+ * @swagger
+ * /user/delete:
+ *   delete:
+ *     summary: Delete the authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User account deleted successfully
+ *       401:
+ *         description: Unauthorized - User not authenticated
+ *       404:
+ *         description: User not found or already deleted
+ *       500:
+ *         description: Internal server error
+ */
+router.delete("/delete", authenticate, deleteUser);
+
+/**
+ * @swagger
+ * /user/update:
+ *   put:
+ *     summary: Update user profile
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 description: Updated full name of the user
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Updated email address of the user
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       400:
+ *         description: No changes detected in the user data
+ *       401:
+ *         description: Unauthorized - User not authenticated
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.put("/update", authenticate, updateUser);
 
 module.exports = router;

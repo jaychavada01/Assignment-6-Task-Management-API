@@ -20,8 +20,9 @@ app.use(i18nMiddleware);
 swaggerDocs(app);
 
 //? Routes
-app.use("/api/user", userRoute);
-app.use("/api/task", taskRoute);
+app.use("/user", userRoute);
+app.use("/task", taskRoute);
+app.use("/comment", taskRoute);
 
 //? Handle invalid routes
 app.use("*", (req, res) => {

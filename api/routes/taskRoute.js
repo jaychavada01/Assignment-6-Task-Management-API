@@ -7,8 +7,9 @@ const {
   getFilteredTasks,
   getTaskById,
   updateTaskStatus,
-  addComment,
-  getTaskComments,
+  assignTask,
+  reassignTask,
+  getAssignedTasks,
 } = require("../controllers/taskController");
 const { authenticate } = require("../middleware/auth");
 
@@ -50,24 +51,14 @@ const router = express.Router();
  *           description: ID of parent task (for subtasks)
  *       required:
  *         - title
- *     Comment:
- *       type: object
- *       properties:
- *         content:
- *           type: string
- *           description: Comment content
- *       required:
- *         - content
  */
 
 /**
  * @swagger
- * /api/task/create:
+ * /task/create:
  *   post:
  *     summary: Create a new task
  *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -79,16 +70,14 @@ const router = express.Router();
  *         description: Task created successfully
  *       400:
  *         description: Invalid input
- *       401:
- *         description: Unauthorized
- *       409:
- *         description: Task with same title already exists
  */
-router.post("/create", authenticate, createTask);
+router.post("/create", createTask);
+
+router.get("/get", authenticate, assignTask);
 
 /**
  * @swagger
- * /api/task/get:
+ * /task/get:
  *   get:
  *     summary: Get all tasks assigned to the logged-in user
  *     tags: [Task Management]
@@ -102,11 +91,11 @@ router.post("/create", authenticate, createTask);
  *       500:
  *         description: Server error
  */
-router.get("/get", authenticate, getAllTasksAssignedToUser);
+router.get("/getallTask", authenticate, getAssignedTasks);
 
 /**
  * @swagger
- * /api/task/filter:
+ * /task/filter:
  *   get:
  *     summary: Get filtered tasks
  *     tags: [Task Management]
@@ -155,7 +144,7 @@ router.get("/filter", authenticate, getFilteredTasks);
 
 /**
  * @swagger
- * /api/task/title/{id}:
+ * /task/title/{id}:
  *   get:
  *     summary: Get task by ID
  *     tags: [Task Management]
@@ -180,7 +169,7 @@ router.get("/title/:id", authenticate, getTaskById);
 
 /**
  * @swagger
- * /api/task/update/{id}:
+ * /task/update/{id}:
  *   put:
  *     summary: Update a task
  *     tags: [Task Management]
@@ -213,7 +202,7 @@ router.put("/update/:id", authenticate, updateTask);
 
 /**
  * @swagger
- * /api/task/updateStatus/{id}:
+ * /task/updateStatus/{id}:
  *   put:
  *     summary: Update task status
  *     tags: [Task Management]
@@ -252,7 +241,7 @@ router.put("/updateStatus/:id", authenticate, updateTaskStatus);
 
 /**
  * @swagger
- * /api/task/delete/{id}:
+ * /task/delete/{id}:
  *   delete:
  *     summary: Delete a task (soft delete)
  *     tags: [Task Management]
@@ -277,67 +266,7 @@ router.put("/updateStatus/:id", authenticate, updateTaskStatus);
  */
 router.delete("/delete/:id", authenticate, deleteTask);
 
-/**
- * @swagger
- * /api/task/comment/{taskId}:
- *   post:
- *     summary: Add a comment to a task
- *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: taskId
- *         required: true
- *         schema:
- *           type: integer
- *         description: Task ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Comment'
- *     responses:
- *       201:
- *         description: Comment added successfully
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Task not found
- */
-router.post("/comment/:taskId", authenticate, addComment);
-
-/**
- * @swagger
- * /api/task/comments/{taskId}:
- *   get:
- *     summary: Get comments for a task
- *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: taskId
- *         required: true
- *         schema:
- *           type: integer
- *         description: Task ID
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *           enum: [newer, older]
- *           default: newer
- *         description: Sort comments by creation date
- *     responses:
- *       200:
- *         description: List of comments for the task
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Task not found
- */
-router.get("/comments/:taskId", authenticate, getTaskComments);
+router.post("/assign-task", authenticate, assignTask);
+router.put("/reassign-task", authenticate, reassignTask);
 
 module.exports = router;

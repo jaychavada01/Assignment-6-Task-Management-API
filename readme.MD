@@ -36,21 +36,29 @@ This **Task Management API** is a backend service built using **Node.js, Express
 - **Authentication:** JWT (JSON Web Tokens)
 - **Notifications:** Firebase Cloud Messaging (FCM)
 
-## 📂 Project Structure
+## 📚 Project Structure
 
 ```
 Assignment 6/
 ├─ api/
 │  ├─ config/
 │  │  ├─ constant.js          # Stores status codes & constants
+│  │  ├─ cron.js              # Cron job setup
 │  │  ├─ database.js          # Database connection setup
 │  │  ├─ firebase.js          # Firebase configuration
-│  │  └─ serviceAccountKey.json # Firebase service account
+│  │  ├─ serviceAccountKey.json # Firebase service account
+│  │  └─ swagger.js           # Swagger API documentation setup
 │  ├─ controllers/
 │  │  ├─ taskController.js    # Task CRUD operations
 │  │  └─ userController.js    # User authentication & profile
+│  ├─ locales/
+│  │  ├─ de.json              # German translations
+│  │  ├─ en.json              # English translations
+│  │  ├─ fr.json              # French translations
+│  │  └─ hi.json              # Hindi translations
 │  ├─ middleware/
-│  │  └─ auth.js              # Authentication middleware
+│  │  ├─ auth.js              # Authentication middleware
+│  │  └─ i18Next.js           # Internationalization middleware
 │  ├─ models/
 │  │  ├─ task.js              # Task model definition
 │  │  ├─ user.js              # User model definition
@@ -150,4 +158,3 @@ The API will be running at `http://localhost:3000`
 - **Token blacklisting** for enhanced security
 - **Password hashing** with bcrypt
 - **Firebase push notifications** for task reminders
-

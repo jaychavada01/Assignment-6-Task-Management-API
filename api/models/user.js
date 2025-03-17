@@ -25,28 +25,49 @@ const User = sequelize.define(
     },
     accessToken: {
       type: DataTypes.STRING,
-      allowNull: true, // Store active token for better security handling
+      allowNull: true,
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     forgetPasswordToken: {
       type: DataTypes.STRING,
-      allowNull: true, // Store
+      allowNull: true,
     },
     forgetPasswordTokenExpiry: {
       type: DataTypes.DATE,
       allowNull: true,
     },
     blacklistedTokens: {
-      type: DataTypes.JSON, // Store blacklisted tokens as an array of strings
+      type: DataTypes.JSON,
       allowNull: true,
       defaultValue: [],
     },
     fcmToken: {
       type: DataTypes.STRING,
-      allowNull: true, // Store
+      allowNull: true,
+    },
+    createdBy: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
+    updatedBy: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    deletedBy: {
+      type: DataTypes.UUID,
+      allowNull: true,
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Enables createdAt and updatedAt
+    paranoid: true, // Enables soft delete (deletedAt)
   }
 );
 

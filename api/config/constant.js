@@ -9,6 +9,7 @@ module.exports = {
     NOT_FOUND: 404,
     CONFLICT: 409,
     SERVER_ERROR: 500,
+    NOT_MODIFIED: 304
   },
 
   //? Validation Rules
@@ -35,6 +36,10 @@ module.exports = {
       token: "required|string",
       newPassword:
         "required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/",
+    },
+    UPDATE_USER: {
+      fullName: "required|string|min:2",
+      email: "required|email",
     },
 
     //? Task Validation Rules

@@ -2,8 +2,8 @@ const { STATUS_CODES, VALIDATION_RULES } = require("../config/constant");
 const Task = require("../models/task");
 const User = require("../models/user");
 const Validator = require("validatorjs");
-const { sendTaskCreationNotification } = require("../utills/notification");
 const Comment = require("../models/comment");
+const { sendTaskAssigned } = require("../utills/notification");
 
 const validateRequest = (data, rules, res) => {
   const validation = new Validator(data, rules);
@@ -21,32 +21,16 @@ exports.createTask = async (req, res) => {
     const { title, description, dueDate, priority, category, parentTaskId } =
       req.body;
 
-    if (!req.user) {
-      return res
-        .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: req.t("auth.unauth_user_not") });
-    }
-
-    const userId = req.user.id;
+    const createdBy = req.user ? req.user.id : null;
 
     // Validate parent task existence if provided
     if (parentTaskId) {
-      const parentTask = await Task.findOne({
-        where: { id: parentTaskId, userId },
-      });
+      const parentTask = await Task.findByPk(parentTaskId);
       if (!parentTask) {
         return res
           .status(STATUS_CODES.NOT_FOUND)
           .json({ message: req.t("task.no_parent") });
       }
-    }
-
-    //? Ensure only one user per task title
-    const existingTask = await Task.findOne({ where: { title, userId } });
-    if (existingTask) {
-      return res.status(STATUS_CODES.CONFLICT).json({
-        message: req.t("task.same_title"),
-      });
     }
 
     const task = await Task.create({
@@ -55,15 +39,9 @@ exports.createTask = async (req, res) => {
       dueDate,
       priority,
       category,
-      userId,
       parentTaskId: parentTaskId || null,
+      createdBy, // Store the user who created the task
     });
-
-    // Fetch user's device token
-    const user = await User.findByPk(userId);
-    if (user && user.fcmtoken) {
-      await sendTaskCreationNotification(user.fcmtoken, title);
-    }
 
     return res
       .status(STATUS_CODES.CREATED)
@@ -72,44 +50,121 @@ exports.createTask = async (req, res) => {
     console.error("Create Task Error:", error);
     return res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: req.t("common.server_error"), error: error.message });
+      .json({ message: req.t("common.server_error") });
   }
 };
 
-//? Get all tasks-subtask assigned to the logged-in user
-exports.getAllTasksAssignedToUser = async (req, res) => {
+// ? assigning task to user
+exports.assignTask = async (req, res) => {
+  try {
+    const { taskId, userId } = req.body;
+
+    const task = await Task.findOne({
+      where: { id: taskId, isDeleted: false },
+    });
+    if (!task)
+      return res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ message: req.t("task.no_task") });
+
+    const user = await User.findOne({
+      where: { id: userId, isDeleted: false },
+    });
+    if (!user)
+      return res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ message: req.t("auth.no_user") });
+
+    task.userId = userId;
+    await task.save();
+
+    if (user?.fcmToken) {
+      await sendTaskAssigned(user.fcmToken, task.title, userId);
+    }
+
+    return res
+      .status(STATUS_CODES.SUCCESS)
+      .json({ message: req.t("task.task_assign") });
+  } catch (error) {
+    return res
+      .status(STATUS_CODES.SERVER_ERROR)
+      .json({ message: req.t("common.server_error") });
+  }
+};
+
+// ? reassign task to new user
+exports.reassignTask = async (req, res) => {
+  try {
+    const { taskId, newUserId } = req.body;
+
+    const task = await Task.findOne({
+      where: { id: taskId, isDeleted: false },
+    });
+    if (!task)
+      return res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ message: req.t("task.no_task") });
+
+    const user = await User.findOne({
+      where: { id: newUserId, isDeleted: false },
+    });
+    if (!user)
+      return res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ message: req.t("auth.no_user") });
+
+    task.userId = newUserId;
+    task.updatedBy = req.user.id;
+    await task.save();
+
+    if (user?.fcmToken) {
+      await sendTaskAssigned(user.fcmToken, task.title, newUserId);
+    }
+
+    return res
+      .status(STATUS_CODES.SUCCESS)
+      .json({ message: req.t("task.task_reassign") });
+  } catch (error) {
+    return res.status(500).json({ message: req.t("common.server_error") });
+  }
+};
+
+//? Get all tasks-subtask-comments assigned to user
+exports.getAssignedTasks = async (req, res) => {
   try {
     const userId = req.user.id;
 
     const tasks = await Task.findAll({
-      where: { userId, isDeleted: false }, // Exclude deleted tasks
+      where: { userId, isDeleted: false },
       include: [
         {
           model: Task,
           as: "subtasks",
-          where: { isDeleted: false }, // Exclude deleted subtasks
-          required: false, // Ensures tasks without subtasks are also included
+          where: { isDeleted: false },
+          required: false, // Include even if there are no subtasks
         },
         {
           model: Comment,
+          where: { isDeleted: false },
           include: [{ model: User, attributes: ["id", "fullName"] }],
-        }, // Include comments
+          required: false, // Include even if there are no comments
+        },
       ],
       order: [["dueDate", "ASC"]],
     });
 
-    res
-      .status(STATUS_CODES.SUCCESS)
-      .json({ message: req.t("task.all_task"), tasks });
+    return res.status(STATUS_CODES.SUCCESS).json({
+      message: req.t("task.all_task"),
+      tasks,
+    });
   } catch (error) {
-    console.error("Error fetching all tasks:", error);
-    res
+    return res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: req.t("common.server_error"), error: error.message });
+      .json({ message: req.t("common.server_error") });
   }
 };
 
-//? Get filtered tasks assigned to the logged-in user
+//? Get filtered tasks assigned to user
 exports.getFilteredTasks = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -149,13 +204,12 @@ exports.getFilteredTasks = async (req, res) => {
   }
 };
 
-//? Get Single Task by ID
+//? Get Single Task by ID for user
 exports.getTaskById = async (req, res) => {
   try {
     const { id } = req.params; // Get id from params
-    const userId = req.user.id; // Get user ID from authenticated request
+    const userId = req.user?.id;
 
-    // Find task with matching title and assigned user
     const task = await Task.findOne({
       where: { id, userId, isDeleted: false },
       include: [
@@ -182,11 +236,11 @@ exports.getTaskById = async (req, res) => {
   }
 };
 
-//? Update Task by id
+//? Update Task by id for user
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id; // Ensure user exists
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(STATUS_CODES.UNAUTHORIZED).json({
@@ -199,12 +253,12 @@ exports.updateTask = async (req, res) => {
     const { title, description, dueDate, priority, category, parentTaskId } =
       req.body;
 
-    const task = await Task.findOne({ where: { id, userId } });
+    const task = await Task.findOne({
+      where: { id, userId, isDeleted: false },
+    });
     if (!task) {
       return res.status(STATUS_CODES.NOT_FOUND).json({
-        success: false,
-        message: req.t("task.not_task"),
-        task: null,
+        message: req.t("task.no_task"),
       });
     }
 
@@ -216,27 +270,28 @@ exports.updateTask = async (req, res) => {
       });
     }
 
-    // ? check if task is deleted
-    if (task.isDeleted) {
-      return res.status(STATUS_CODES.BAD_REQUEST).json({
+    // Check if any changes were made
+    const isSameData =
+      title === task.title &&
+      description === task.description &&
+      dueDate === task.dueDate &&
+      priority === task.priority &&
+      category === task.category &&
+      parentTaskId === task.parentTaskId;
+
+    if (isSameData) {
+      return res.status(STATUS_CODES.NOT_MODIFIED).json({
         success: false,
-        message: req.t("task.delete_no_update"),
+        message: req.t("task.no_changes"),
       });
     }
 
-    const updatedFields = {
-      title,
-      description,
-      dueDate,
-      priority,
-      category,
-      parentTaskId,
-    };
-
-    await Task.update(updatedFields, { where: { id, userId } });
+    await Task.update(
+      { title, description, dueDate, priority, category, parentTaskId },
+      { where: { id, userId } }
+    );
 
     res.status(STATUS_CODES.SUCCESS).json({
-      success: true,
       message: req.t("task.task_updated"),
       task,
     });
@@ -256,7 +311,10 @@ exports.updateTaskStatus = async (req, res) => {
     const userId = req.user.id;
     const { status } = req.body;
 
-    const task = await Task.findOne({ where: { id, userId } });
+    const task = await Task.findOne({
+      where: { id, userId, isDeleted: false },
+    });
+
     if (!task) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -268,7 +326,7 @@ exports.updateTaskStatus = async (req, res) => {
       "inprocess",
       "inreview",
       "testing",
-      "Completed",
+      "completed",
     ];
     if (!validStatuses.includes(status)) {
       return res
@@ -276,25 +334,22 @@ exports.updateTaskStatus = async (req, res) => {
         .json({ message: req.t("task.invalid_status") });
     }
 
-    // ? check if task is deleted
-    if (task.isDeleted) {
-      return res.status(STATUS_CODES.BAD_REQUEST).json({
+    // Check if status is unchanged
+    if (task.status === status) {
+      return res.status(STATUS_CODES.NOT_MODIFIED).json({
         success: false,
-        message: req.t("task.delete_no_update_status"),
+        message: req.t("task.no_changes"),
       });
     }
 
     await Task.update({ status }, { where: { id, userId } });
 
     res.status(STATUS_CODES.SUCCESS).json({
-      success: true,
       message: req.t("task.task_updated"),
     });
   } catch (error) {
-    console.error("Error updating task status:", error);
     res.status(STATUS_CODES.SERVER_ERROR).json({
       message: req.t("common.server_error"),
-      error: error.message,
     });
   }
 };
@@ -305,99 +360,30 @@ exports.deleteTask = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const task = await Task.findOne({ where: { id, userId } });
-    if (!task)
+    const task = await Task.findOne({
+      where: { id, userId, isDeleted: false },
+    });
+    
+    if (!task) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ success: false, message: req.t("task.no_task") });
-
-    // Check if the task is already deleted
-    if (task.isDeleted) {
-      return res
-        .status(STATUS_CODES.BAD_REQUEST)
-        .json({ success: false, message: req.t("task.already_deleted") });
     }
 
-    // Soft delete the task (set isDeleted to true)
-    await task.update({ isDeleted: true });
+    // Soft delete the task (set isDeleted to true and store deletion details)
+    await task.update({
+      isDeleted: true,
+      deletedBy: userId, // Track who deleted the task
+      deletedAt: new Date(), // Timestamp of deletion
+    });
+
     res
       .status(STATUS_CODES.SUCCESS)
       .json({ success: true, message: req.t("task.deleted") });
   } catch (error) {
+    console.error("Error deleting task:", error);
     res
       .status(STATUS_CODES.SERVER_ERROR)
       .json({ message: req.t("common.server_error") });
-  }
-};
-
-exports.addComment = async (req, res) => {
-  try {
-    const { taskId } = req.params;
-    const { content } = req.body;
-    const userId = req.user.id;
-
-    // ? check if task exists and is not deleted
-    const task = await Task.findOne({
-      where: { id: taskId, isDeleted: false },
-    });
-    if (!task) {
-      return res.status(STATUS_CODES.NOT_FOUND).json({
-        success: false,
-        message: req.t("task.no_task"),
-      });
-    }
-
-    const comment = await Comment.create({
-      content,
-      userId,
-      taskId,
-    });
-
-    res.status(STATUS_CODES.CREATED).json({
-      message: req.t("comment.added"),
-      comment,
-    });
-  } catch (error) {
-    res
-      .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: req.t("common.server_error") });
-  }
-};
-
-exports.getTaskComments = async (req, res) => {
-  try {
-    const { taskId } = req.params;
-    const { sortBy = "newer" } = req.query; // Default sorting by "newer"
-
-    // Check if task exists and is not deleted
-    const task = await Task.findOne({
-      where: { id: taskId, isDeleted: false },
-    });
-    if (!task) {
-      return res.status(STATUS_CODES.NOT_FOUND).json({
-        success: false,
-        message: req.t("task.no_task"),
-      });
-    }
-
-    const orderCondition = sortBy.toLowerCase() === "older" ? "ASC" : "DESC";
-
-    const comments = await Comment.findAll({
-      where: { taskId },
-      include: [{ model: User, attributes: ["id", "fullName"] }],
-      order: [["createdAt", orderCondition]], // Sort by createdAt
-    });
-
-    res.status(STATUS_CODES.SUCCESS).json({
-      success: true,
-      message: req.t("comment.all_comments"),
-      comments,
-    });
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    res.status(STATUS_CODES.SERVER_ERROR).json({
-      message: req.t("common.server_error"),
-      error: error.message,
-    });
   }
 };
