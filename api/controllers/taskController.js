@@ -24,7 +24,7 @@ exports.createTask = async (req, res) => {
     if (!req.user) {
       return res
         .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Unauthorized: User not found" });
+        .json({ message: req.t("auth.unauth_user_not") });
     }
 
     const userId = req.user.id;
@@ -37,7 +37,7 @@ exports.createTask = async (req, res) => {
       if (!parentTask) {
         return res
           .status(STATUS_CODES.NOT_FOUND)
-          .json({ message: "Parent task not found or not assigned to user." });
+          .json({ message: req.t("task.no_parent") });
       }
     }
 
@@ -45,7 +45,7 @@ exports.createTask = async (req, res) => {
     const existingTask = await Task.findOne({ where: { title, userId } });
     if (existingTask) {
       return res.status(STATUS_CODES.CONFLICT).json({
-        message: "Task with this title already exists for this user.",
+        message: req.t("task.same_title"),
       });
     }
 
@@ -67,12 +67,12 @@ exports.createTask = async (req, res) => {
 
     return res
       .status(STATUS_CODES.CREATED)
-      .json({ message: "Task created successfully", task });
+      .json({ message: req.t("task.created"), task });
   } catch (error) {
     console.error("Create Task Error:", error);
     return res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error in create task!", error: error.message });
+      .json({ message: req.t("common.server_error"), error: error.message });
   }
 };
 
@@ -100,12 +100,12 @@ exports.getAllTasksAssignedToUser = async (req, res) => {
 
     res
       .status(STATUS_CODES.SUCCESS)
-      .json({ message: "All tasks retrieved successfully!", tasks });
+      .json({ message: req.t("task.all_task"), tasks });
   } catch (error) {
     console.error("Error fetching all tasks:", error);
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error fetching tasks!", error: error.message });
+      .json({ message: req.t("common.server_error"), error: error.message });
   }
 };
 
@@ -140,12 +140,12 @@ exports.getFilteredTasks = async (req, res) => {
 
     res
       .status(STATUS_CODES.SUCCESS)
-      .json({ message: "Filtered tasks retrieved successfully!", tasks });
+      .json({ message: req.t("task.filter"), tasks });
   } catch (error) {
     console.error("Error fetching filtered tasks:", error);
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error fetching tasks!", error: error.message });
+      .json({ message: req.t("common.server_error"), error: error.message });
   }
 };
 
@@ -170,7 +170,7 @@ exports.getTaskById = async (req, res) => {
     if (!task) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .json({ success: false, message: "Task not found" });
+        .json({ success: false, message: req.t("task.no_task") });
     }
 
     res.status(STATUS_CODES.SUCCESS).json({ success: true, task });
@@ -178,7 +178,7 @@ exports.getTaskById = async (req, res) => {
     console.error("Get Task By Title Error:", error);
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ success: false, message: "Error in getting task by id!" });
+      .json({ message: req.t("common.server_error") });
   }
 };
 
@@ -191,7 +191,7 @@ exports.updateTask = async (req, res) => {
     if (!userId) {
       return res.status(STATUS_CODES.UNAUTHORIZED).json({
         success: false,
-        message: "Unauthorized: User not found",
+        message: req.t("auth.unauth_user_not"),
         task: null,
       });
     }
@@ -203,7 +203,7 @@ exports.updateTask = async (req, res) => {
     if (!task) {
       return res.status(STATUS_CODES.NOT_FOUND).json({
         success: false,
-        message: "Task not found",
+        message: req.t("task.not_task"),
         task: null,
       });
     }
@@ -211,7 +211,7 @@ exports.updateTask = async (req, res) => {
     // Prevent a task from being its own parent
     if (parentTaskId && parentTaskId === id) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
-        message: "A task cannot be its own parent.",
+        message: req.t("task.not_own_parent"),
         task: null,
       });
     }
@@ -220,7 +220,7 @@ exports.updateTask = async (req, res) => {
     if (task.isDeleted) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Task is deleted can't updated",
+        message: req.t("task.delete_no_update"),
       });
     }
 
@@ -237,13 +237,13 @@ exports.updateTask = async (req, res) => {
 
     res.status(STATUS_CODES.SUCCESS).json({
       success: true,
-      message: "Task updated successfully",
+      message: req.t("task.task_updated"),
       task,
     });
   } catch (error) {
     console.error("Error updating task:", error);
     res.status(STATUS_CODES.SERVER_ERROR).json({
-      message: "Error updating task!",
+      message: req.t("common.server_error"),
       error: error.message,
       task: null,
     });
@@ -260,7 +260,7 @@ exports.updateTaskStatus = async (req, res) => {
     if (!task) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .json({ success: false, message: "Task not found" });
+        .json({ message: req.t("task.no_task") });
     }
 
     const validStatuses = [
@@ -273,14 +273,14 @@ exports.updateTaskStatus = async (req, res) => {
     if (!validStatuses.includes(status)) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
-        .json({ message: "Invalid status value!" });
+        .json({ message: req.t("task.invalid_status") });
     }
 
     // ? check if task is deleted
     if (task.isDeleted) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Task is deleted can't updated Status",
+        message: req.t("task.delete_no_update_status"),
       });
     }
 
@@ -288,12 +288,12 @@ exports.updateTaskStatus = async (req, res) => {
 
     res.status(STATUS_CODES.SUCCESS).json({
       success: true,
-      message: "Task status updated successfully",
+      message: req.t("task.task_updated"),
     });
   } catch (error) {
     console.error("Error updating task status:", error);
     res.status(STATUS_CODES.SERVER_ERROR).json({
-      message: "Error updating task status!",
+      message: req.t("common.server_error"),
       error: error.message,
     });
   }
@@ -309,24 +309,24 @@ exports.deleteTask = async (req, res) => {
     if (!task)
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .json({ success: false, message: "Task not found" });
+        .json({ success: false, message: req.t("task.no_task") });
 
     // Check if the task is already deleted
     if (task.isDeleted) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
-        .json({ success: false, message: "Task is already deleted" });
+        .json({ success: false, message: req.t("task.already_deleted") });
     }
 
     // Soft delete the task (set isDeleted to true)
     await task.update({ isDeleted: true });
     res
       .status(STATUS_CODES.SUCCESS)
-      .json({ success: true, message: "Task deleted successfully" });
+      .json({ success: true, message: req.t("task.deleted") });
   } catch (error) {
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error in getting task deleted!" });
+      .json({ message: req.t("common.server_error") });
   }
 };
 
@@ -343,7 +343,7 @@ exports.addComment = async (req, res) => {
     if (!task) {
       return res.status(STATUS_CODES.NOT_FOUND).json({
         success: false,
-        message: "Task not found or is deleted",
+        message: req.t("task.no_task"),
       });
     }
 
@@ -354,13 +354,13 @@ exports.addComment = async (req, res) => {
     });
 
     res.status(STATUS_CODES.CREATED).json({
-      message: "Comment added successfully",
+      message: req.t("comment.added"),
       comment,
     });
   } catch (error) {
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error in adding comment!" });
+      .json({ message: req.t("common.server_error") });
   }
 };
 
@@ -376,7 +376,7 @@ exports.getTaskComments = async (req, res) => {
     if (!task) {
       return res.status(STATUS_CODES.NOT_FOUND).json({
         success: false,
-        message: "Task not found or is deleted",
+        message: req.t("task.no_task"),
       });
     }
 
@@ -390,13 +390,13 @@ exports.getTaskComments = async (req, res) => {
 
     res.status(STATUS_CODES.SUCCESS).json({
       success: true,
-      message: "Comments retrieved successfully",
+      message: req.t("comment.all_comments"),
       comments,
     });
   } catch (error) {
     console.error("Error fetching comments:", error);
     res.status(STATUS_CODES.SERVER_ERROR).json({
-      message: "Error fetching comments!",
+      message: req.t("common.server_error"),
       error: error.message,
     });
   }

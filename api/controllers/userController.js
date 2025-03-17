@@ -38,7 +38,7 @@ exports.signupUser = async (req, res, next) => {
     if (existingUser)
       return res
         .status(STATUS_CODES.BAD_REQUEST)
-        .json({ message: "User already exists" });
+        .json({ message: req.t("auth.user_exists") });
 
     // ? Create new user
     const newUser = await User.create({ fullName, email, password });
@@ -56,10 +56,10 @@ exports.signupUser = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.CREATED)
-      .json({ message: "Signup Successfull!", accessToken: token });
+      .json({ message: req.t("auth.signup_success"), accessToken: token });
   } catch (error) {
     console.log(error.message);
-    res.status(STATUS_CODES.SERVER_ERROR).json({ message: "Error in signup!" });
+    res.status(STATUS_CODES.SERVER_ERROR).json({ message: req.t("common.server_error") });
   }
 };
 exports.loginUser = async (req, res, next) => {
@@ -72,12 +72,12 @@ exports.loginUser = async (req, res, next) => {
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .json({ message: "User not found" });
+        .json({ message: req.t("auth.no_user") });
 
     if (!(await bcrypt.compare(password, user.password))) {
       return res
         .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Invalid credentials" });
+        .json({ message: req.t("auth.invalid_data") });
     }
 
     // **Clear blacklisted tokens upon successful login**
@@ -87,12 +87,12 @@ exports.loginUser = async (req, res, next) => {
     const token = await generateToken(user);
 
     res.status(STATUS_CODES.SUCCESS).json({
-      message: "User logged in successfully!",
+      message: req.t("auth.login_success"),
       accessToken: token,
     });
   } catch (error) {
     console.log(error.message);
-    res.status(STATUS_CODES.SERVER_ERROR).json({ message: "Error in login!" });
+    res.status(STATUS_CODES.SERVER_ERROR).json({ message: req.t("common.server_error") });
   }
 };
 
@@ -105,7 +105,7 @@ exports.logoutUser = async (req, res) => {
     if (user.blacklistedTokens.includes(token)) {
       return res
         .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Already Logged Out!" });
+        .json({ message: req.t("auth.already_logout") });
     }
 
     // ? Add token to blacklist array
@@ -114,10 +114,10 @@ exports.logoutUser = async (req, res) => {
     user.fcmToken = null; // ? Clear fcm tokens
     await user.save();
 
-    res.status(STATUS_CODES.SUCCESS).json({ message: "Logout Successful!" });
+    res.status(STATUS_CODES.SUCCESS).json({ message: req.t("auth.logout_success") });
   } catch (error) {
     console.log(error.message);
-    res.status(STATUS_CODES.SERVER_ERROR).json({ message: "Error in logout!" });
+    res.status(STATUS_CODES.SERVER_ERROR).json({ message: req.t("common.server_error") });
   }
 };
 
@@ -133,7 +133,7 @@ exports.forgotPassword = async (req, res) => {
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .json({ message: "User not found!" });
+        .json({ message: req.t("auth.no_user") });
 
     // Generate unique token and expiry time (10 min)
     const forgetPasswordToken = uuidv4();
@@ -164,13 +164,13 @@ exports.forgotPassword = async (req, res) => {
     await sendEmail(user.email, "Reset Your Password", htmlContent);
 
     res.status(STATUS_CODES.SUCCESS).json({
-      message: "Reset link sent! Check your email.",
+      message: req.t("auth.reset_link"),
     });
   } catch (error) {
     console.log(error.message);
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error sending reset email!" });
+      .json({ message: req.t("common.server_error") });
   }
 };
 
@@ -193,7 +193,7 @@ exports.resetPassword = async (req, res) => {
     if (!user) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
-        .json({ message: "Invalid Token!" });
+        .json({ message: req.t("auth.invalid_token") });
     }
 
     // Update password & clear reset token
@@ -204,12 +204,12 @@ exports.resetPassword = async (req, res) => {
 
     res
       .status(STATUS_CODES.SUCCESS)
-      .json({ message: "Password reset successful!" });
+      .json({ message: req.t("auth.reset_success") });
   } catch (error) {
     console.error("Reset Password Error:", error);
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error in resetpassword!" });
+      .json({ message: req.t("common.server_error")});
   }
 };
 
@@ -225,7 +225,7 @@ exports.changePassword = async (req, res) => {
     if (!user) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .json({ message: "User not found!" });
+        .json({ message: req.t("auth.no_user") });
     }
 
     //? Verify old password
@@ -233,13 +233,13 @@ exports.changePassword = async (req, res) => {
     if (!isMatch) {
       return res
         .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Incorrect Old Password!" });
+        .json({ message: req.t("auth.incorrect_old_password") });
     }
 
     if (oldPassword == newPassword) {
       return res
         .status(STATUS_CODES.FORBIDDEN)
-        .json({ message: "Entered old password! Use unique & new One." });
+        .json({ message: req.t("auth.same_old_password") });
     }
 
     // Update to new password
@@ -255,11 +255,11 @@ exports.changePassword = async (req, res) => {
 
     res
       .status(STATUS_CODES.SUCCESS)
-      .json({ message: "Password changed successfully!" });
+      .json({ message: req.t("auth.password_changed") });
   } catch (error) {
     console.error("Change Password Error:", error);
     res
       .status(STATUS_CODES.SERVER_ERROR)
-      .json({ message: "Error in Change password" });
+      .json({ message: req.t("common.server_error") });
   }
 };

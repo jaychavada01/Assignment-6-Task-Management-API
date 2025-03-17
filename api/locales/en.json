@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "signup_success": "User registered successfully",
+    "login_success": "Login successful",
+    "logout_success": "Logout successful",
+    "already_logout": "Already logged out",
+    "user_exists": "User already Exist!",
+    "invalid_data": "Invalid credentials",
+    "no_user": "User not found",
+    "unauthorized": "Unauthorized, token missing!",
+    "invalid_token": "Invalid or expired token!",
+    "blacklisted_token": "Token is blacklisted!",
+    "unauth_access": "Unauthorized Access!",
+    "reset_link": "Reset link sent! Check your email.",
+    "reset_success": "Password reset successfully!",
+    "incorrect_old_password": "Old password is incorrect!",
+    "same_old_password": "Entered old password, Use different!",
+    "password_changed": "Password Changed Successfully!",
+    "unauth_user_not": "Unauthorized User not found!"
+  },
+  "task": {
+    "no_parent": "Parent task not found or not assigned to user.",
+    "same_title": "Task with this title already exists for this user.",
+    "created": "Task created successfully",
+    "all_task": "All tasks retrieved successfully!",
+    "filter": "Filtered tasks retrieved successfully!",
+    "no_task": "Task not found!",
+    "not_own_parent": "A task cannot be its own parent.",
+    "delete_no_update": "Task is deleted! Can't update it",
+    "delete_no_update_status": "Task is deleted! Can't update status of it",
+    "task_updated": "Task updated successfully",
+    "invalid_status": "Invalid status value!",
+    "already_deleted": "Task is already deleted",
+    "deleted": "Task deleted successfully"
+  },
+  "comment":{
+    "added": "Comment added successfully",
+    "all_comments": "Comments retrieved successfully"
+  },
+  "common": {
+    "server_error": "Something went wrong, please try again later",
+    "invalid_routes": "Invalid route"
+  }
+}

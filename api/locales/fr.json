@@ -1,0 +1,45 @@
+{
+	"auth": {
+	  "signup_success": "Utilisateur enregistré avec succès",
+	  "login_success": "Connexion réussie",
+	  "logout_success": "Déconnexion réussie",
+	  "already_logout": "Déjà déconnecté",
+	  "user_exists": "L'utilisateur existe déjà!",
+	  "invalid_data": "Identifiants invalides",
+	  "no_user": "Utilisateur non trouvé",
+	  "unauthorized": "Non autorisé, jeton manquant!",
+	  "invalid_token": "Jeton invalide ou expiré!",
+	  "blacklisted_token": "Le jeton est sur liste noire!",
+	  "unauth_access": "Accès non autorisé!",
+	  "reset_link": "Lien de réinitialisation envoyé! Vérifiez votre e-mail.",
+	  "reset_success": "Mot de passe réinitialisé avec succès!",
+	  "incorrect_old_password": "L'ancien mot de passe est incorrect!",
+	  "same_old_password": "Ancien mot de passe saisi, veuillez en utiliser un autre!",
+	  "password_changed": "Mot de passe changé avec succès!",
+	  "unauth_user_not": "Utilisateur non autorisé non trouvé!"
+	},
+	"task": {
+	  "no_parent": "Tâche parente non trouvée ou non assignée à l'utilisateur.",
+	  "same_title": "Une tâche avec ce titre existe déjà pour cet utilisateur.",
+	  "created": "Tâche créée avec succès",
+	  "all_task": "Toutes les tâches récupérées avec succès!",
+	  "filter": "Tâches filtrées récupérées avec succès!",
+	  "no_task": "Tâche non trouvée!",
+	  "not_own_parent": "Une tâche ne peut pas être sa propre tâche parente.",
+	  "delete_no_update": "Tâche supprimée! Impossible de la mettre à jour",
+	  "delete_no_update_status": "Tâche supprimée! Impossible de mettre à jour son statut",
+	  "task_updated": "Tâche mise à jour avec succès",
+	  "invalid_status": "Valeur de statut invalide!",
+	  "already_deleted": "Tâche déjà supprimée",
+	  "deleted": "Tâche supprimée avec succès"
+	},
+	"comment": {
+	  "added": "Commentaire ajouté avec succès",
+	  "all_comments": "Commentaires récupérés avec succès"
+	},
+	"common": {
+	  "server_error": "Une erreur est survenue, veuillez réessayer plus tard",
+	  "invalid_routes": "Itinéraire invalide"
+	}
+  }
+  

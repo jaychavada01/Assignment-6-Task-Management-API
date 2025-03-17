@@ -9,7 +9,7 @@ exports.authenticate = async (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res
         .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Unauthorized, token missing!" });
+        .json({ message: req.t("auth.unauthorized") });
     }
 
     const token = authHeader.split(" ")[1];
@@ -21,14 +21,14 @@ exports.authenticate = async (req, res, next) => {
     if (!user) {
       return res
         .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Unauthorized user!" });
+        .json({ message: req.t("auth.invalid_token") });
     }
 
     // ? Check if token is blacklisted OR accessToken is null
     if (!user.accessToken || user.blacklistedTokens.includes(token)) {
       return res
         .status(STATUS_CODES.UNAUTHORIZED)
-        .json({ message: "Token is Blacklisted or Invalid!" });
+        .json({ message: req.t("auth.blacklisted_token") });
     }
 
     req.user = user;
@@ -36,6 +36,6 @@ exports.authenticate = async (req, res, next) => {
   } catch (error) {
     return res
       .status(STATUS_CODES.UNAUTHORIZED)
-      .json({ message: "Unauthorized Access!" });
+      .json({ message: req.t("auth.unauth_access") });
   }
 };

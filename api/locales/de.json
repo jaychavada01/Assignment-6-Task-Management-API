@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "signup_success": "Benutzer erfolgreich registriert",
+    "login_success": "Erfolgreich eingeloggt",
+    "logout_success": "Erfolgreich ausgeloggt",
+    "already_logout": "Bereits ausgeloggt",
+    "user_exists": "Benutzer existiert bereits!",
+    "invalid_data": "Ungültige Anmeldeinformationen",
+    "no_user": "Benutzer nicht gefunden",
+    "unauthorized": "Unbefugt, Token fehlt!",
+    "invalid_token": "Ungültiges oder abgelaufenes Token!",
+    "blacklisted_token": "Token ist gesperrt!",
+    "unauth_access": "Unbefugter Zugriff!",
+    "reset_link": "Zurücksetzungslink gesendet! Überprüfen Sie Ihre E-Mail.",
+    "reset_success": "Passwort erfolgreich zurückgesetzt!",
+    "incorrect_old_password": "Altes Passwort ist falsch!",
+    "same_old_password": "Eingegebenes altes Passwort, bitte ein anderes verwenden!",
+    "password_changed": "Passwort erfolgreich geändert!",
+    "unauth_user_not": "Unbefugter Benutzer nicht gefunden!"
+  },
+  "task": {
+    "no_parent": "Übergeordnete Aufgabe nicht gefunden oder nicht zugewiesen.",
+    "same_title": "Eine Aufgabe mit diesem Titel existiert bereits für diesen Benutzer.",
+    "created": "Aufgabe erfolgreich erstellt",
+    "all_task": "Alle Aufgaben erfolgreich abgerufen!",
+    "filter": "Gefilterte Aufgaben erfolgreich abgerufen!",
+    "no_task": "Aufgabe nicht gefunden!",
+    "not_own_parent": "Eine Aufgabe kann nicht ihre eigene übergeordnete Aufgabe sein.",
+    "delete_no_update": "Aufgabe wurde gelöscht! Kann nicht aktualisiert werden",
+    "delete_no_update_status": "Aufgabe wurde gelöscht! Status kann nicht aktualisiert werden",
+    "task_updated": "Aufgabe erfolgreich aktualisiert",
+    "invalid_status": "Ungültiger Statuswert!",
+    "already_deleted": "Aufgabe wurde bereits gelöscht",
+    "deleted": "Aufgabe erfolgreich gelöscht"
+  },
+  "comment": {
+    "added": "Kommentar erfolgreich hinzugefügt",
+    "all_comments": "Kommentare erfolgreich abgerufen"
+  },
+  "common": {
+    "server_error": "Etwas ist schiefgelaufen, bitte versuchen Sie es später erneut",
+    "invalid_routes": "Ungültige Route"
+  }
+}
