@@ -81,7 +81,8 @@ const Task = sequelize.define(
     },
   },
   {
-    timestamps: true, // Enables createdAt and updatedAt
+    // when we use sequelize it auto generates createdAt, updatedAt columns in table
+    // timestamps: true,
     paranoid: true, // Enables soft delete (deletedAt)
   }
 );
