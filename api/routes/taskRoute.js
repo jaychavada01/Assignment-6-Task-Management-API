@@ -72,18 +72,6 @@ router.post("/create", authenticate, createTask);
 
 /**
  * @swagger
- * /tasks/get:
- *   get:
- *     summary: Get assigned tasks
- *     tags: [Task Management]
- *     responses:
- *       200:
- *         description: List of assigned tasks
- */
-router.get("/get", authenticate, getAssignedTasks);
-
-/**
- * @swagger
  * /tasks/getallTask:
  *   get:
  *     summary: Get all tasks

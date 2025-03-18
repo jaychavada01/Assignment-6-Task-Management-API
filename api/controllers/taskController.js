@@ -17,6 +17,7 @@ const validateRequest = (data, rules, res) => {
 
 exports.createTask = async (req, res) => {
   try {
+    console.log("Task Request Body:", req.body);
     if (!validateRequest(req.body, VALIDATION_RULES.CREATE_TASK, res)) return;
 
     const {
