@@ -37,11 +37,15 @@
     "deleted": "Task deleted successfully",
     "task_assign": "Task assigned successfully",
     "task_reassign": "Task re-assigned successfully",
-    "no_changes" : "No changes were made"
+    "no_changes": "No changes were made"
   },
   "comment": {
     "added": "Comment added successfully",
-    "all_comments": "Comments retrieved successfully"
+    "all_comments": "Comments retrieved successfully",
+    "no_comment": "No comments available for this task.",
+    "updated": "Comment updated successfully",
+    "not_modified": "Comment not modified",
+    "deleted": "Comment deleted succesfully"
   },
   "common": {
     "server_error": "Something went wrong, please try again later",

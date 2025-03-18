@@ -17,12 +17,18 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Authentication
- *   description: User authentication endpoints
+ *   description: User authentication and management endpoints
  */
 
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ * 
  *   schemas:
  *     User:
  *       type: object
@@ -42,6 +48,7 @@ const router = express.Router();
  *         - fullName
  *         - email
  *         - password
+ * 
  *     LoginCredentials:
  *       type: object
  *       properties:
@@ -56,6 +63,7 @@ const router = express.Router();
  *       required:
  *         - email
  *         - password
+ * 
  *     PasswordReset:
  *       type: object
  *       properties:
@@ -74,6 +82,7 @@ const router = express.Router();
  *         - email
  *         - token
  *         - newPassword
+ * 
  *     PasswordChange:
  *       type: object
  *       properties:
@@ -88,10 +97,6 @@ const router = express.Router();
  *       required:
  *         - oldPassword
  *         - newPassword
- *      DeleteUser:
- *        type: object
- *        properties:
- *
  */
 
 /**

@@ -6,6 +6,7 @@ const { sequelize } = require("./config/database");
 const { STATUS_CODES } = require("./config/constant");
 const userRoute = require("./routes/userRoute.js");
 const taskRoute = require("./routes/taskRoute.js");
+const commentRoute = require("./routes/commentRoute.js");
 const i18nMiddleware = require("./middleware/i18Next.js");
 const swaggerDocs = require("./config/swagger.js");
 
@@ -22,7 +23,7 @@ swaggerDocs(app);
 //? Routes
 app.use("/user", userRoute);
 app.use("/task", taskRoute);
-app.use("/comment", taskRoute);
+app.use("/comment", commentRoute);
 
 //? Handle invalid routes
 app.use("*", (req, res) => {

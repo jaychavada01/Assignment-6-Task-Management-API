@@ -26,7 +26,7 @@ const Comment = sequelize.define(
     },
     userId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: User,
         key: "id",
@@ -35,7 +35,7 @@ const Comment = sequelize.define(
     },
     isDeleted: {
       type: DataTypes.BOOLEAN,
-      efaultValue: false,
+      defaultValue: false,
     },
     createdBy: {
       type: DataTypes.UUID,
@@ -56,7 +56,7 @@ const Comment = sequelize.define(
   },
   {
     // when we use sequelize it auto generates createdAt, updatedAt columns in table
-    // timestamps: true,
+    timestamps: true,
     paranoid: true, // Enables soft delete (deletedAt)
   }
 );
@@ -64,7 +64,7 @@ const Comment = sequelize.define(
 Task.hasMany(Comment, { foreignKey: "taskId", onDelete: "CASCADE" });
 Comment.belongsTo(Task, { foreignKey: "taskId" });
 
-User.hasMany(Comment, { foreignKey: "userId", onDelete: "CASCADE" });
-Comment.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Comment, { foreignKey: "userId", onDelete: "SET NULL" });
+Comment.belongsTo(User, { foreignKey: "userId", onDelete: "SET NULL" });
 
 module.exports = Comment;

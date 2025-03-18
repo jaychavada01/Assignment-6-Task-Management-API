@@ -3,7 +3,7 @@ const Task = require("../models/task");
 const User = require("../models/user");
 const Validator = require("validatorjs");
 const Comment = require("../models/comment");
-const { sendTaskAssigned } = require("../utills/notification");
+const { sendTaskAssigned, sendTaskDeletionNotification, sendTaskUpdateNotification } = require("../utills/notification");
 
 const validateRequest = (data, rules, res) => {
   const validation = new Validator(data, rules);
@@ -18,10 +18,16 @@ const validateRequest = (data, rules, res) => {
 exports.createTask = async (req, res) => {
   try {
     if (!validateRequest(req.body, VALIDATION_RULES.CREATE_TASK, res)) return;
-    const { title, description, dueDate, priority, category, parentTaskId } =
-      req.body;
 
-    const createdBy = req.user ? req.user.id : null;
+    const {
+      title,
+      description,
+      dueDate,
+      priority,
+      category,
+      parentTaskId,
+      createdBy,
+    } = req.body;
 
     // Validate parent task existence if provided
     if (parentTaskId) {
@@ -40,7 +46,7 @@ exports.createTask = async (req, res) => {
       priority,
       category,
       parentTaskId: parentTaskId || null,
-      createdBy, // Store the user who created the task
+      createdBy: createdBy || null,
     });
 
     return res
@@ -70,6 +76,7 @@ exports.assignTask = async (req, res) => {
     const user = await User.findOne({
       where: { id: userId, isDeleted: false },
     });
+
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -190,7 +197,20 @@ exports.getFilteredTasks = async (req, res) => {
     const tasks = await Task.findAll({
       where: whereCondition,
       order: orderCondition,
-      include: [{ model: Task, as: "subtasks" }],
+      include: [
+        {
+          model: Task,
+          as: "subtasks",
+          where: { isDeleted: false },
+          required: false, // Include even if there are no subtasks
+        },
+        {
+          model: Comment,
+          where: { isDeleted: false },
+          include: [{ model: User, attributes: ["id", "fullName"] }],
+          required: false, // Include even if there are no comments
+        },
+      ],
     });
 
     res
@@ -291,6 +311,14 @@ exports.updateTask = async (req, res) => {
       { where: { id, userId } }
     );
 
+    // Retrieve user for push notification
+    const user = await User.findOne({
+      where: { id: userId, isDeleted: false },
+    });
+    if (user.fcmToken) {
+      await sendTaskUpdateNotification(user.fcmToken, task.title);
+    }
+
     res.status(STATUS_CODES.SUCCESS).json({
       message: req.t("task.task_updated"),
       task,
@@ -342,6 +370,14 @@ exports.updateTaskStatus = async (req, res) => {
       });
     }
 
+    // Retrieve user for push notification
+    const user = await User.findOne({
+      where: { id: userId, isDeleted: false },
+    });
+    if (user.fcmToken) {
+      await sendTaskUpdateNotification(user.fcmToken, task.title);
+    }
+
     await Task.update({ status }, { where: { id, userId } });
 
     res.status(STATUS_CODES.SUCCESS).json({
@@ -363,25 +399,31 @@ exports.deleteTask = async (req, res) => {
     const task = await Task.findOne({
       where: { id, userId, isDeleted: false },
     });
-    
+
     if (!task) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ success: false, message: req.t("task.no_task") });
     }
 
-    // Soft delete the task (set isDeleted to true and store deletion details)
+    // Soft delete the task using Sequelize's destroy() method
     await task.update({
+      deletedBy: userId,
       isDeleted: true,
-      deletedBy: userId, // Track who deleted the task
-      deletedAt: new Date(), // Timestamp of deletion
     });
 
-    res
-      .status(STATUS_CODES.SUCCESS)
-      .json({ success: true, message: req.t("task.deleted") });
+    await task.destroy();
+
+    // Retrieve user for push notification
+    const user = await User.findOne({
+      where: { id: userId, isDeleted: false },
+    });
+    if (user.fcmToken) {
+      await sendTaskDeletionNotification(user.fcmToken, task.title);
+    }
+
+    res.status(STATUS_CODES.SUCCESS).json({ message: req.t("task.deleted") });
   } catch (error) {
-    console.error("Error deleting task:", error);
     res
       .status(STATUS_CODES.SERVER_ERROR)
       .json({ message: req.t("common.server_error") });

@@ -1,7 +1,6 @@
 const express = require("express");
 const {
   createTask,
-  getAllTasksAssignedToUser,
   updateTask,
   deleteTask,
   getFilteredTasks,
@@ -55,7 +54,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /task/create:
+ * /tasks/create:
  *   post:
  *     summary: Create a new task
  *     tags: [Task Management]
@@ -68,205 +67,135 @@ const router = express.Router();
  *     responses:
  *       201:
  *         description: Task created successfully
- *       400:
- *         description: Invalid input
  */
-router.post("/create", createTask);
-
-router.get("/get", authenticate, assignTask);
+router.post("/create", authenticate, createTask);
 
 /**
  * @swagger
- * /task/get:
+ * /tasks/get:
  *   get:
- *     summary: Get all tasks assigned to the logged-in user
+ *     summary: Get assigned tasks
  *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of assigned tasks
+ */
+router.get("/get", authenticate, getAssignedTasks);
+
+/**
+ * @swagger
+ * /tasks/getallTask:
+ *   get:
+ *     summary: Get all tasks
+ *     tags: [Task Management]
  *     responses:
  *       200:
  *         description: List of all tasks
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Server error
  */
 router.get("/getallTask", authenticate, getAssignedTasks);
 
 /**
  * @swagger
- * /task/filter:
+ * /tasks/filter:
  *   get:
- *     summary: Get filtered tasks
+ *     summary: Filter tasks based on criteria
  *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [todo, inprocess, inreview, testing, Completed]
- *         description: Filter by task status
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *         description: Filter by task category
- *       - in: query
- *         name: priority
- *         schema:
- *           type: string
- *           enum: [low, medium, high]
- *         description: Filter by priority level
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *           default: dueDate
- *         description: Field to sort by
- *       - in: query
- *         name: order
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *           default: asc
- *         description: Sort order (ascending or descending)
  *     responses:
  *       200:
- *         description: Filtered list of tasks
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Server error
+ *         description: List of filtered tasks
  */
 router.get("/filter", authenticate, getFilteredTasks);
 
 /**
  * @swagger
- * /task/title/{id}:
+ * /tasks/title/{id}:
  *   get:
  *     summary: Get task by ID
  *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: integer
  *         description: Task ID
  *     responses:
  *       200:
  *         description: Task details
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Task not found
  */
 router.get("/title/:id", authenticate, getTaskById);
 
 /**
  * @swagger
- * /task/update/{id}:
+ * /tasks/update/{id}:
  *   put:
  *     summary: Update a task
  *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: integer
  *         description: Task ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Task'
  *     responses:
  *       200:
  *         description: Task updated successfully
- *       400:
- *         description: Invalid input or task is deleted
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Task not found
  */
 router.put("/update/:id", authenticate, updateTask);
 
 /**
  * @swagger
- * /task/updateStatus/{id}:
+ * /tasks/updateStatus/{id}:
  *   put:
  *     summary: Update task status
  *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: integer
  *         description: Task ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 enum: [todo, inprocess, inreview, testing, Completed]
- *             required:
- *               - status
  *     responses:
  *       200:
  *         description: Task status updated successfully
- *       400:
- *         description: Invalid status or task is deleted
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Task not found
  */
 router.put("/updateStatus/:id", authenticate, updateTaskStatus);
 
 /**
  * @swagger
- * /task/delete/{id}:
+ * /tasks/delete/{id}:
  *   delete:
- *     summary: Delete a task (soft delete)
+ *     summary: Delete a task
  *     tags: [Task Management]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: integer
  *         description: Task ID
  *     responses:
  *       200:
  *         description: Task deleted successfully
- *       400:
- *         description: Task already deleted
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Task not found
  */
 router.delete("/delete/:id", authenticate, deleteTask);
 
+/**
+ * @swagger
+ * /tasks/assign-task:
+ *   post:
+ *     summary: Assign a task to a user
+ *     tags: [Task Management]
+ *     responses:
+ *       200:
+ *         description: Task assigned successfully
+ */
 router.post("/assign-task", authenticate, assignTask);
+
+/**
+ * @swagger
+ * /tasks/reassign-task:
+ *   put:
+ *     summary: Reassign a task to another user
+ *     tags: [Task Management]
+ *     responses:
+ *       200:
+ *         description: Task reassigned successfully
+ */
 router.put("/reassign-task", authenticate, reassignTask);
 
 module.exports = router;

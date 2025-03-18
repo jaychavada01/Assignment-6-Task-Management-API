@@ -1,44 +1,54 @@
 {
   "auth": {
     "signup_success": "Benutzer erfolgreich registriert",
-    "login_success": "Erfolgreich eingeloggt",
-    "logout_success": "Erfolgreich ausgeloggt",
-    "already_logout": "Bereits ausgeloggt",
+    "login_success": "Anmeldung erfolgreich",
+    "logout_success": "Abmeldung erfolgreich",
+    "already_logout": "Bereits abgemeldet",
     "user_exists": "Benutzer existiert bereits!",
     "invalid_data": "Ungültige Anmeldeinformationen",
     "no_user": "Benutzer nicht gefunden",
     "unauthorized": "Unbefugt, Token fehlt!",
     "invalid_token": "Ungültiges oder abgelaufenes Token!",
-    "blacklisted_token": "Token ist gesperrt!",
+    "blacklisted_token": "Token ist auf der schwarzen Liste!",
     "unauth_access": "Unbefugter Zugriff!",
     "reset_link": "Zurücksetzungslink gesendet! Überprüfen Sie Ihre E-Mail.",
     "reset_success": "Passwort erfolgreich zurückgesetzt!",
     "incorrect_old_password": "Altes Passwort ist falsch!",
-    "same_old_password": "Eingegebenes altes Passwort, bitte ein anderes verwenden!",
+    "same_old_password": "Altes Passwort eingegeben, bitte ein anderes verwenden!",
     "password_changed": "Passwort erfolgreich geändert!",
-    "unauth_user_not": "Unbefugter Benutzer nicht gefunden!"
+    "unauth_user_not": "Unbefugt! Benutzer nicht gefunden!",
+    "delete_success": "Benutzer erfolgreich gelöscht!",
+    "update_success": "Benutzer erfolgreich aktualisiert!",
+    "same_data": "Nichts geändert!"
   },
   "task": {
-    "no_parent": "Übergeordnete Aufgabe nicht gefunden oder nicht zugewiesen.",
-    "same_title": "Eine Aufgabe mit diesem Titel existiert bereits für diesen Benutzer.",
+    "no_parent": "Elternaufgabe nicht gefunden oder nicht dem Benutzer zugewiesen.",
+    "same_title": "Aufgabe mit diesem Titel existiert bereits für diesen Benutzer.",
     "created": "Aufgabe erfolgreich erstellt",
     "all_task": "Alle Aufgaben erfolgreich abgerufen!",
     "filter": "Gefilterte Aufgaben erfolgreich abgerufen!",
     "no_task": "Aufgabe nicht gefunden!",
-    "not_own_parent": "Eine Aufgabe kann nicht ihre eigene übergeordnete Aufgabe sein.",
-    "delete_no_update": "Aufgabe wurde gelöscht! Kann nicht aktualisiert werden",
-    "delete_no_update_status": "Aufgabe wurde gelöscht! Status kann nicht aktualisiert werden",
+    "not_own_parent": "Eine Aufgabe kann nicht ihre eigene Elternaufgabe sein.",
+    "delete_no_update": "Aufgabe ist gelöscht! Kann nicht aktualisiert werden",
+    "delete_no_update_status": "Aufgabe ist gelöscht! Status kann nicht aktualisiert werden",
     "task_updated": "Aufgabe erfolgreich aktualisiert",
     "invalid_status": "Ungültiger Statuswert!",
     "already_deleted": "Aufgabe wurde bereits gelöscht",
-    "deleted": "Aufgabe erfolgreich gelöscht"
+    "deleted": "Aufgabe erfolgreich gelöscht",
+    "task_assign": "Aufgabe erfolgreich zugewiesen",
+    "task_reassign": "Aufgabe erfolgreich neu zugewiesen",
+    "no_changes": "Keine Änderungen vorgenommen"
   },
   "comment": {
     "added": "Kommentar erfolgreich hinzugefügt",
-    "all_comments": "Kommentare erfolgreich abgerufen"
+    "all_comments": "Kommentare erfolgreich abgerufen",
+    "no_comment": "Keine Kommentare für diese Aufgabe verfügbar.",
+    "updated": "Kommentar erfolgreich aktualisiert",
+    "not_modified": "Kommentar nicht geändert",
+    "deleted": "Kommentar erfolgreich gelöscht"
   },
   "common": {
-    "server_error": "Etwas ist schiefgelaufen, bitte versuchen Sie es später erneut",
+    "server_error": "Etwas ist schief gelaufen, bitte versuchen Sie es später erneut",
     "invalid_routes": "Ungültige Route"
   }
 }

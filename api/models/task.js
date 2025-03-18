@@ -66,6 +66,12 @@ const Task = sequelize.define(
     createdBy: {
       type: DataTypes.UUID,
       allowNull: true,
+      references: {
+        model: User,
+        key: "id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "SET NULL",
     },
     updatedBy: {
       type: DataTypes.UUID,
@@ -82,7 +88,7 @@ const Task = sequelize.define(
   },
   {
     // when we use sequelize it auto generates createdAt, updatedAt columns in table
-    // timestamps: true,
+    timestamps: true,
     paranoid: true, // Enables soft delete (deletedAt)
   }
 );
