@@ -12,31 +12,24 @@ const swaggerDocs = require("./config/swagger.js");
 
 const app = express();
 
-// ? middleware
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(i18nMiddleware);
 
-//? Serve Swagger API Documentation
+// Swagger API Documentation
 swaggerDocs(app);
 
-//? Routes
+// Routes
 app.use("/user", userRoute);
 app.use("/task", taskRoute);
 app.use("/comment", commentRoute);
 
-//? Handle invalid routes
+// Handle invalid routes
 app.use("*", (req, res) => {
   res
     .status(STATUS_CODES.BAD_REQUEST)
     .json({ message: req.t("common.invalid_routes") });
 });
 
-// ? sync sequelize and start server
-sequelize.sync({ alter: true }).then(() => {
-  console.log("Database Synced!");
-  app.listen(process.env.PORT, () => {
-    console.log(`Server running on http://localhost:${process.env.PORT}`);
-    console.log(`Swagger Docs available at: http://localhost:${process.env.PORT}/api-docs`);
-  });
-});
+module.exports = app;
