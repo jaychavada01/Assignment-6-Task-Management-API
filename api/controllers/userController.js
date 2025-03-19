@@ -51,6 +51,13 @@ exports.signupUser = async (req, res) => {
     const newUser = await User.create({ fullName, email, password, createdBy });
     const token = await generateToken(newUser);
 
+    const savedUser = await User.findByPk(newUser.id);
+    if (!savedUser) {
+      return res
+        .status(STATUS_CODES.SERVER_ERROR)
+        .json({ message: req.t("auth.signup_failure")});
+    }
+
     // Send welcome email asynchronously
     sendEmail(
       email,
@@ -69,7 +76,7 @@ exports.signupUser = async (req, res) => {
 
     res
       .status(STATUS_CODES.CREATED)
-      .json({ message: req.t("auth.signup_success"), accessToken: token });
+      .json({ message: req.t("auth.signup_success"), accessToken: token , userId:savedUser.id});
   } catch (error) {
     res
       .status(STATUS_CODES.SERVER_ERROR)

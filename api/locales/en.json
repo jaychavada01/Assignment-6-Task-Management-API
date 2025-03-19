@@ -1,6 +1,7 @@
 {
   "auth": {
     "signup_success": "User registered successfully",
+    "signup_failure": "User registration failed",
     "login_success": "Login successful",
     "logout_success": "Logout successful",
     "already_logout": "Already logged out",
@@ -49,6 +50,7 @@
   },
   "common": {
     "server_error": "Something went wrong, please try again later",
-    "invalid_routes": "Invalid route"
+    "invalid_routes": "Invalid route",
+    "missing_fields": "Something is missing!"
   }
 }

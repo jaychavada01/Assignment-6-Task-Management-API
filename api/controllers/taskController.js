@@ -3,7 +3,11 @@ const Task = require("../models/task");
 const User = require("../models/user");
 const Validator = require("validatorjs");
 const Comment = require("../models/comment");
-const { sendTaskAssigned, sendTaskDeletionNotification, sendTaskUpdateNotification } = require("../utills/notification");
+const {
+  sendTaskAssigned,
+  sendTaskDeletionNotification,
+  sendTaskUpdateNotification,
+} = require("../utills/notification");
 
 const validateRequest = (data, rules, res) => {
   const validation = new Validator(data, rules);
@@ -17,7 +21,6 @@ const validateRequest = (data, rules, res) => {
 
 exports.createTask = async (req, res) => {
   try {
-    console.log("Task Request Body:", req.body);
     if (!validateRequest(req.body, VALIDATION_RULES.CREATE_TASK, res)) return;
 
     const {
@@ -66,6 +69,12 @@ exports.assignTask = async (req, res) => {
   try {
     const { taskId, userId } = req.body;
 
+    if (!taskId || !userId) {
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ message: req.t("common.missing_fields") });
+    }
+
     const task = await Task.findOne({
       where: { id: taskId, isDeleted: false },
     });
@@ -94,6 +103,7 @@ exports.assignTask = async (req, res) => {
       .status(STATUS_CODES.SUCCESS)
       .json({ message: req.t("task.task_assign") });
   } catch (error) {
+    console.error("Assign Task Error:", error);
     return res
       .status(STATUS_CODES.SERVER_ERROR)
       .json({ message: req.t("common.server_error") });
@@ -105,21 +115,25 @@ exports.reassignTask = async (req, res) => {
   try {
     const { taskId, newUserId } = req.body;
 
+    if (!taskId || !newUserId) {
+      return res
+        .status(400)
+        .json({ message: "Task ID and New User ID are required" });
+    }
+
     const task = await Task.findOne({
       where: { id: taskId, isDeleted: false },
     });
-    if (!task)
-      return res
-        .status(STATUS_CODES.NOT_FOUND)
-        .json({ message: req.t("task.no_task") });
+    if (!task) {
+      return res.status(404).json({ message: req.t("task.no_task") });
+    }
 
     const user = await User.findOne({
       where: { id: newUserId, isDeleted: false },
     });
-    if (!user)
-      return res
-        .status(STATUS_CODES.NOT_FOUND)
-        .json({ message: req.t("auth.no_user") });
+    if (!user) {
+      return res.status(404).json({ message: req.t("auth.no_user") });
+    }
 
     task.userId = newUserId;
     task.updatedBy = req.user.id;
@@ -129,9 +143,7 @@ exports.reassignTask = async (req, res) => {
       await sendTaskAssigned(user.fcmToken, task.title, newUserId);
     }
 
-    return res
-      .status(STATUS_CODES.SUCCESS)
-      .json({ message: req.t("task.task_reassign") });
+    return res.status(200).json({ message: req.t("task.task_reassign") });
   } catch (error) {
     return res.status(500).json({ message: req.t("common.server_error") });
   }
@@ -149,13 +161,13 @@ exports.getAssignedTasks = async (req, res) => {
           model: Task,
           as: "subtasks",
           where: { isDeleted: false },
-          required: false, // Include even if there are no subtasks
+          required: false,
         },
         {
           model: Comment,
           where: { isDeleted: false },
           include: [{ model: User, attributes: ["id", "fullName"] }],
-          required: false, // Include even if there are no comments
+          required: false,
         },
       ],
       order: [["dueDate", "ASC"]],
@@ -166,11 +178,13 @@ exports.getAssignedTasks = async (req, res) => {
       tasks,
     });
   } catch (error) {
+    console.error("Error fetching assigned tasks:", error);
     return res
       .status(STATUS_CODES.SERVER_ERROR)
       .json({ message: req.t("common.server_error") });
   }
 };
+
 
 //? Get filtered tasks assigned to user
 exports.getFilteredTasks = async (req, res) => {
