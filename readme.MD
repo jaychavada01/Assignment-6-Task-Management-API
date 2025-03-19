@@ -36,6 +36,7 @@ This **Task Management API** is a backend service built using **Node.js, Express
 - **Authentication:** JWT (JSON Web Tokens)
 - **Notifications:** Firebase Cloud Messaging (FCM)
 
+
 ## 📚 Project Structure
 
 ```
@@ -50,7 +51,8 @@ Assignment 6/
 │  │  └─ swagger.js           # Swagger API documentation setup
 │  ├─ controllers/
 │  │  ├─ taskController.js    # Task CRUD operations
-│  │  └─ userController.js    # User authentication & profile
+│  │  ├─ userController.js    # User authentication & profile
+│  │  ├─ commentController.js # Task comments operations
 │  ├─ locales/
 │  │  ├─ de.json              # German translations
 │  │  ├─ en.json              # English translations
@@ -66,9 +68,14 @@ Assignment 6/
 │  ├─ routes/
 │  │  ├─ taskRoute.js         # Task API routes
 │  │  ├─ userRoute.js         # User authentication routes
+│  │  ├─ commentRoute.js      # Comment-related routes
 │  ├─ utils/
 │  │  ├─ mailer.js            # Email handling utility
 │  │  ├─ notification.js      # FCM notification handler
+│  ├─ test/
+│  │  ├─ setup.spec.js        # Test setup configuration
+│  │  ├─ task.spec.js         # Task-related test cases
+│  │  ├─ user.spec.js         # User authentication test cases
 │  ├─ .env                    # Environment variables
 │  ├─ app.js                  # Main application entry point
 │  ├─ package-lock.json
